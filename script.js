@@ -64,6 +64,74 @@ document.getElementById('lowerFrequency').addEventListener('keydown', function(e
     if (e.key === 'Enter') addBand();
 });
 
+// Peak octave band finder
+function findPeakBand() {
+    if (!currentAudioBuffer) {
+        showStatus('Load an audio file first.', 'error');
+        return;
+    }
+
+    const octaves = Number(document.getElementById('octaveWidth').value);
+    if (!octaves || octaves <= 0) {
+        showStatus('Enter a valid octave width (e.g. 1).', 'error');
+        return;
+    }
+
+    showStatus('Sweeping bands...', 'loading');
+
+    const halfOct = octaves / 2;
+    const minF = 20;
+    const maxF = 20000;
+
+    // Sweep center frequencies in log space
+    const steps = 200;
+    const logMin = Math.log2(minF * Math.pow(2, halfOct));
+    const logMax = Math.log2(maxF / Math.pow(2, halfOct));
+
+    if (logMin >= logMax) {
+        showStatus('Octave width too large for 20–20k range.', 'error');
+        return;
+    }
+
+    let bestRms = -1;
+    let bestF1 = 0;
+    let bestF2 = 0;
+    let bestPeak = 0;
+
+    for (let i = 0; i <= steps; i++) {
+        const logFc = logMin + (logMax - logMin) * (i / steps);
+        const fc = Math.pow(2, logFc);
+        const f1 = fc / Math.pow(2, halfOct);
+        const f2 = fc * Math.pow(2, halfOct);
+
+        const [rms, peak] = computeBandRMS(currentAudioBuffer, f1, f2);
+        if (rms > bestRms) {
+            bestRms = rms;
+            bestPeak = peak;
+            bestF1 = f1;
+            bestF2 = f2;
+        }
+    }
+
+    // Display result
+    document.getElementById('peakBandLabel').textContent =
+        `${Math.round(bestF1)} – ${Math.round(bestF2)} Hz`;
+    document.getElementById('peakBandRms').textContent = bestRms.toFixed(6);
+    document.getElementById('peakBandRmsDb').textContent =
+        (20 * Math.log10(bestRms)).toFixed(2) + ' dB';
+    document.getElementById('peakBandPeak').textContent = bestPeak.toFixed(6);
+    document.getElementById('peakBandPeakDb').textContent =
+        (20 * Math.log10(bestPeak)).toFixed(2) + ' dB';
+    document.getElementById('peakBandResult').style.display = 'block';
+
+    showStatus('Peak band found.', 'success');
+}
+
+document.getElementById('findPeakBtn').addEventListener('click', findPeakBand);
+document.getElementById('octaveWidth').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') findPeakBand();
+});
+
 // Analysis + rendering
 function analyzeAndRender() {
     const [rmsIntensity, peakIntensity] = computeRMSintensityAudioBuffer(currentAudioBuffer);

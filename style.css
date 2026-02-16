@@ -133,6 +133,30 @@ h1 {
     opacity: 0.85;
 }
 
+.card-desc {
+    font-size: 0.82rem;
+    color: #666;
+    margin: -0.5rem 0 1rem;
+}
+
+/* Peak Band Result */
+.peak-result {
+    margin-top: 1rem;
+    background: #12121f;
+    border-radius: 10px;
+    padding: 1rem;
+}
+
+.peak-band-label {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #4ecca3;
+    text-align: center;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #2a2a40;
+}
+
 /* Band Chips */
 .band-chips {
     display: flex;
