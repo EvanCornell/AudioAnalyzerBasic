@@ -1,12 +1,115 @@
 //Audio Context
 const audioContext = new AudioContext();
-let currentAudioBuffer= null;
+let currentAudioBuffer = null;
+
+// Band list
+const bands = [];
 
 //Status message
 function showStatus(message, type = 'loading'){
     const status = document.getElementById('status');
     status.textContent = message;
     status.className = 'status visible ' + type;
+}
+
+// Band management
+function addBand() {
+    const f1Input = document.getElementById('lowerFrequency');
+    const f2Input = document.getElementById('upperFrequency');
+    const f1 = Number(f1Input.value);
+    const f2 = Number(f2Input.value);
+
+    if (!f1 || !f2 || f1 >= f2) {
+        showStatus('Enter valid frequencies (lower < upper).', 'error');
+        return;
+    }
+
+    bands.push({ f1, f2 });
+    f1Input.value = '';
+    f2Input.value = '';
+    f1Input.focus();
+    renderBandChips();
+
+    if (currentAudioBuffer) {
+        analyzeAndRender();
+    }
+}
+
+function removeBand(index) {
+    bands.splice(index, 1);
+    renderBandChips();
+
+    if (currentAudioBuffer) {
+        analyzeAndRender();
+    }
+}
+
+function renderBandChips() {
+    const container = document.getElementById('bandList');
+    container.innerHTML = '';
+    bands.forEach((band, i) => {
+        const chip = document.createElement('span');
+        chip.className = 'band-chip';
+        chip.innerHTML = `${band.f1} – ${band.f2} Hz<button onclick="removeBand(${i})">&times;</button>`;
+        container.appendChild(chip);
+    });
+}
+
+// Wire up Add button and Enter key
+document.getElementById('addBandBtn').addEventListener('click', addBand);
+document.getElementById('upperFrequency').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') addBand();
+});
+document.getElementById('lowerFrequency').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') addBand();
+});
+
+// Analysis + rendering
+function analyzeAndRender() {
+    const [rmsIntensity, peakIntensity] = computeRMSintensityAudioBuffer(currentAudioBuffer);
+
+    // Total signal
+    document.getElementById('rmsValue').textContent = rmsIntensity.toFixed(6);
+    document.getElementById('rmsDb').textContent = (20 * Math.log10(rmsIntensity)).toFixed(2) + ' dB';
+    document.getElementById('peakValue').textContent = peakIntensity.toFixed(6);
+    document.getElementById('peakDb').textContent = (20 * Math.log10(peakIntensity)).toFixed(2) + ' dB';
+
+    // Remove old dynamic band blocks
+    const grid = document.getElementById('resultsGrid');
+    grid.querySelectorAll('.band-result-block').forEach(el => el.remove());
+
+    // Compute and render each band
+    bands.forEach(band => {
+        const [rms, peak] = computeBandRMS(currentAudioBuffer, band.f1, band.f2);
+        const rmsDb = (20 * Math.log10(rms)).toFixed(2);
+        const peakDb = (20 * Math.log10(peak)).toFixed(2);
+
+        const block = document.createElement('div');
+        block.className = 'result-block band-result-block';
+        block.innerHTML = `
+            <h3>${band.f1} – ${band.f2} Hz</h3>
+            <div class="result-row">
+                <span class="result-label">RMS Amplitude</span>
+                <span class="result-value">${rms.toFixed(6)}</span>
+            </div>
+            <div class="result-row">
+                <span class="result-label">RMS (dBFS)</span>
+                <span class="result-value">${rmsDb} dB</span>
+            </div>
+            <div class="result-row">
+                <span class="result-label">Peak Amplitude</span>
+                <span class="result-value">${peak.toFixed(6)}</span>
+            </div>
+            <div class="result-row">
+                <span class="result-label">Peak (dBFS)</span>
+                <span class="result-value">${peakDb} dB</span>
+            </div>
+        `;
+        grid.appendChild(block);
+    });
+
+    document.getElementById('resultsCard').style.display = 'block';
+    showStatus('Analysis complete.', 'success');
 }
 
 //file input handler
@@ -24,27 +127,7 @@ document.getElementById('fileInput').addEventListener('change',async function(e)
         currentAudioBuffer = await audioContext.decodeAudioData(arrayBuffer);
         showStatus('Analyzing...');
 
-        const [rmsIntensity, peakIntensity] = computeRMSintensityAudioBuffer(currentAudioBuffer);
-
-        const f1 = Number(document.getElementById('lowerFrequency').value);
-        const f2 = Number(document.getElementById('upperFrequency').value);
-
-        const [rmsBandIntensity, peakBandIntensity] = computeBandRMS(currentAudioBuffer, f1, f2);
-
-        // Populate total signal results
-        document.getElementById('rmsValue').textContent = rmsIntensity.toFixed(6);
-        document.getElementById('rmsDb').textContent = (20 * Math.log10(rmsIntensity)).toFixed(2) + ' dB';
-        document.getElementById('peakValue').textContent = peakIntensity.toFixed(6);
-        document.getElementById('peakDb').textContent = (20 * Math.log10(peakIntensity)).toFixed(2) + ' dB';
-
-        // Populate band-limited results
-        document.getElementById('bandRmsValue').textContent = rmsBandIntensity.toFixed(6);
-        document.getElementById('bandRmsDb').textContent = (20 * Math.log10(rmsBandIntensity)).toFixed(2) + ' dB';
-        document.getElementById('bandPeakValue').textContent = peakBandIntensity.toFixed(6);
-        document.getElementById('bandPeakDb').textContent = (20 * Math.log10(peakBandIntensity)).toFixed(2) + ' dB';
-
-        document.getElementById('resultsCard').style.display = 'block';
-        showStatus('Analysis complete.', 'success');
+        analyzeAndRender();
 
     } catch (error) {
         showStatus('Error: ' + error.message, 'error');

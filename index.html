@@ -25,24 +25,26 @@
             </section>
 
             <section class="card">
-                <h2>Bandpass Filter</h2>
-                <div class="freq-inputs">
+                <h2>Frequency Bands</h2>
+                <div class="add-band-row">
                     <div class="input-group">
-                        <label for="lowerFrequency">Lower Frequency (Hz)</label>
+                        <label for="lowerFrequency">Lower (Hz)</label>
                         <input type="number" id="lowerFrequency" placeholder="e.g. 200" min="0">
                     </div>
                     <div class="input-group">
-                        <label for="upperFrequency">Upper Frequency (Hz)</label>
+                        <label for="upperFrequency">Upper (Hz)</label>
                         <input type="number" id="upperFrequency" placeholder="e.g. 4000" min="0">
                     </div>
+                    <button id="addBandBtn" class="add-band-btn" type="button">Add</button>
                 </div>
+                <div class="band-chips" id="bandList"></div>
             </section>
 
             <div id="status" class="status"></div>
 
             <section class="card results-card" id="resultsCard" style="display:none;">
                 <h2>Results</h2>
-                <div class="results-grid">
+                <div class="results-grid" id="resultsGrid">
                     <div class="result-block">
                         <h3>Total Signal</h3>
                         <div class="result-row">
@@ -60,25 +62,6 @@
                         <div class="result-row">
                             <span class="result-label">Peak (dBFS)</span>
                             <span class="result-value" id="peakDb">—</span>
-                        </div>
-                    </div>
-                    <div class="result-block">
-                        <h3>Band-Limited</h3>
-                        <div class="result-row">
-                            <span class="result-label">RMS Amplitude</span>
-                            <span class="result-value" id="bandRmsValue">—</span>
-                        </div>
-                        <div class="result-row">
-                            <span class="result-label">RMS (dBFS)</span>
-                            <span class="result-value" id="bandRmsDb">—</span>
-                        </div>
-                        <div class="result-row">
-                            <span class="result-label">Peak Amplitude</span>
-                            <span class="result-value" id="bandPeakValue">—</span>
-                        </div>
-                        <div class="result-row">
-                            <span class="result-label">Peak (dBFS)</span>
-                            <span class="result-value" id="bandPeakDb">—</span>
                         </div>
                     </div>
                 </div>

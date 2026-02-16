@@ -105,6 +105,69 @@ h1 {
     font-weight: 500;
 }
 
+/* Add Band Row */
+.add-band-row {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-end;
+}
+
+.add-band-row .input-group {
+    flex: 1;
+}
+
+.add-band-btn {
+    padding: 0.6rem 1.2rem;
+    background: linear-gradient(135deg, #6e8efb, #a777e3);
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+}
+
+.add-band-btn:hover {
+    opacity: 0.85;
+}
+
+/* Band Chips */
+.band-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.band-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.6rem 0.35rem 0.75rem;
+    background: #252540;
+    border: 1px solid #3a3a55;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    color: #c0c0d0;
+}
+
+.band-chip button {
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0 0.15rem;
+    line-height: 1;
+    transition: color 0.15s;
+}
+
+.band-chip button:hover {
+    color: #e85d75;
+}
+
 /* Frequency Inputs */
 .freq-inputs {
     display: grid;
@@ -165,6 +228,10 @@ h1 {
     border: 1px solid rgba(232, 93, 117, 0.2);
 }
 
+.status.success {
+    color: #4ecca3;
+}
+
 /* Results */
 .results-card h2 {
     color: #6e8efb;
@@ -172,7 +239,7 @@ h1 {
 
 .results-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 1rem;
 }
 
