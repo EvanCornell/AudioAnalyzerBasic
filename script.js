@@ -30,7 +30,8 @@ document.getElementById('fileInput').addEventListener('change',async function(e)
 
         const [rmsBandIntensity,peakBandIntensity] = computeBandRMS(currentAudioBuffer, f1, f2);
 
-        showStatus(`BandLimited RMS amplitude: ${rmsBandIntensity.toFixed(6)} (${(20*Math.log10(rmsBandIntensity)).toFixed(2)} dBFS)   Total RMS amplitude: ${rmsIntensity.toFixed(6)} (${(20*Math.log10(rmsIntensity)).toFixed(2)} dBFS)  Peak Intensity ${peakIntensity.toFixed(6)} (${(20*Math.log10(peakIntensity)).toFixed(2)} dBFS)`);
+        showStatus(`BandLimited RMS amplitude: ${rmsBandIntensity.toFixed(6)} (${(20*Math.log10(rmsBandIntensity)).toFixed(2)} dBFS) Peak Band Intensity ${peakBandIntensity.toFixed(6)} (${(20*Math.log10(peakBandIntensity)).toFixed(2)} dBFS)
+           Total RMS amplitude: ${rmsIntensity.toFixed(6)} (${(20*Math.log10(rmsIntensity)).toFixed(2)} dBFS)  Peak Intensity ${peakIntensity.toFixed(6)} (${(20*Math.log10(peakIntensity)).toFixed(2)} dBFS)`);
 
 
 
