@@ -3,10 +3,10 @@ const audioContext = new AudioContext();
 let currentAudioBuffer= null;
 
 //Status message
-function showStatus(message){
+function showStatus(message, type = 'loading'){
     const status = document.getElementById('status');
     status.textContent = message;
-    status.style.display = 'block';
+    status.className = 'status visible ' + type;
 }
 
 //file input handler
@@ -14,30 +14,40 @@ document.getElementById('fileInput').addEventListener('change',async function(e)
     const file = e.target.files[0];
     if(!file) return;
 
+    document.getElementById('fileName').textContent = file.name;
     showStatus('Loading audio file...');
+
     try {
-        
         const arrayBuffer = await file.arrayBuffer();
-        showStatus('Decoding audio');
+        showStatus('Decoding audio...');
 
         currentAudioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-        showStatus('Computing spectrum...');
+        showStatus('Analyzing...');
 
-        const [rmsIntensity,peakIntensity] = computeRMSintensityAudioBuffer(currentAudioBuffer);
-        
+        const [rmsIntensity, peakIntensity] = computeRMSintensityAudioBuffer(currentAudioBuffer);
+
         const f1 = Number(document.getElementById('lowerFrequency').value);
         const f2 = Number(document.getElementById('upperFrequency').value);
 
-        const [rmsBandIntensity,peakBandIntensity] = computeBandRMS(currentAudioBuffer, f1, f2);
+        const [rmsBandIntensity, peakBandIntensity] = computeBandRMS(currentAudioBuffer, f1, f2);
 
-        showStatus(`BandLimited RMS amplitude: ${rmsBandIntensity.toFixed(6)} (${(20*Math.log10(rmsBandIntensity)).toFixed(2)} dBFS) Peak Band Intensity ${peakBandIntensity.toFixed(6)} (${(20*Math.log10(peakBandIntensity)).toFixed(2)} dBFS)
-           Total RMS amplitude: ${rmsIntensity.toFixed(6)} (${(20*Math.log10(rmsIntensity)).toFixed(2)} dBFS)  Peak Intensity ${peakIntensity.toFixed(6)} (${(20*Math.log10(peakIntensity)).toFixed(2)} dBFS)`);
+        // Populate total signal results
+        document.getElementById('rmsValue').textContent = rmsIntensity.toFixed(6);
+        document.getElementById('rmsDb').textContent = (20 * Math.log10(rmsIntensity)).toFixed(2) + ' dB';
+        document.getElementById('peakValue').textContent = peakIntensity.toFixed(6);
+        document.getElementById('peakDb').textContent = (20 * Math.log10(peakIntensity)).toFixed(2) + ' dB';
 
+        // Populate band-limited results
+        document.getElementById('bandRmsValue').textContent = rmsBandIntensity.toFixed(6);
+        document.getElementById('bandRmsDb').textContent = (20 * Math.log10(rmsBandIntensity)).toFixed(2) + ' dB';
+        document.getElementById('bandPeakValue').textContent = peakBandIntensity.toFixed(6);
+        document.getElementById('bandPeakDb').textContent = (20 * Math.log10(peakBandIntensity)).toFixed(2) + ' dB';
 
-
+        document.getElementById('resultsCard').style.display = 'block';
+        showStatus('Analysis complete.', 'success');
 
     } catch (error) {
-        showStatus('Error: ' + error.message);
+        showStatus('Error: ' + error.message, 'error');
         console.log(error);
     }
 });

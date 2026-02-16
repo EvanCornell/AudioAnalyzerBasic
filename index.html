@@ -1,32 +1,92 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
         <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>RMS Audio Analyzer</title>
         <link rel="stylesheet" href="./style.css">
     </head>
     <body>
-        <h1>RMS intesity Analyzer</h1>
-        <div class="controls">
-            <div class="control-group">
-                <input type="file" id = "fileInput" accept="audio/*">
-            </div>
+        <div class="container">
+            <header>
+                <h1>RMS Intensity Analyzer</h1>
+                <p class="subtitle">Analyze RMS and peak intensity of audio files</p>
+            </header>
+
+            <section class="card">
+                <h2>Upload Audio</h2>
+                <label class="file-upload" id="fileLabel">
+                    <input type="file" id="fileInput" accept="audio/*">
+                    <span class="file-upload-icon">&#9835;</span>
+                    <span class="file-upload-text">Choose an audio file</span>
+                    <span class="file-upload-hint">WAV, MP3, OGG, FLAC, etc.</span>
+                </label>
+                <p class="file-name" id="fileName"></p>
+            </section>
+
+            <section class="card">
+                <h2>Bandpass Filter</h2>
+                <div class="freq-inputs">
+                    <div class="input-group">
+                        <label for="lowerFrequency">Lower Frequency (Hz)</label>
+                        <input type="number" id="lowerFrequency" placeholder="e.g. 200" min="0">
+                    </div>
+                    <div class="input-group">
+                        <label for="upperFrequency">Upper Frequency (Hz)</label>
+                        <input type="number" id="upperFrequency" placeholder="e.g. 4000" min="0">
+                    </div>
+                </div>
+            </section>
+
+            <div id="status" class="status"></div>
+
+            <section class="card results-card" id="resultsCard" style="display:none;">
+                <h2>Results</h2>
+                <div class="results-grid">
+                    <div class="result-block">
+                        <h3>Total Signal</h3>
+                        <div class="result-row">
+                            <span class="result-label">RMS Amplitude</span>
+                            <span class="result-value" id="rmsValue">—</span>
+                        </div>
+                        <div class="result-row">
+                            <span class="result-label">RMS (dBFS)</span>
+                            <span class="result-value" id="rmsDb">—</span>
+                        </div>
+                        <div class="result-row">
+                            <span class="result-label">Peak Amplitude</span>
+                            <span class="result-value" id="peakValue">—</span>
+                        </div>
+                        <div class="result-row">
+                            <span class="result-label">Peak (dBFS)</span>
+                            <span class="result-value" id="peakDb">—</span>
+                        </div>
+                    </div>
+                    <div class="result-block">
+                        <h3>Band-Limited</h3>
+                        <div class="result-row">
+                            <span class="result-label">RMS Amplitude</span>
+                            <span class="result-value" id="bandRmsValue">—</span>
+                        </div>
+                        <div class="result-row">
+                            <span class="result-label">RMS (dBFS)</span>
+                            <span class="result-value" id="bandRmsDb">—</span>
+                        </div>
+                        <div class="result-row">
+                            <span class="result-label">Peak Amplitude</span>
+                            <span class="result-value" id="bandPeakValue">—</span>
+                        </div>
+                        <div class="result-row">
+                            <span class="result-label">Peak (dBFS)</span>
+                            <span class="result-value" id="bandPeakDb">—</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <canvas id="canvas"></canvas>
         </div>
 
-        <label for="lowerFrequency">Lower Frequency</label>
-        <!-- 1. The input element with a unique ID -->
-        <input type="text" id="lowerFrequency" placeholder="Type here...">
-
-        <label for="upperFrequency">Upper Frequency:</label>
-        <!-- 1. The input element with a unique ID -->
-        <input type="text" id="upperFrequency" placeholder="Type here...">
-
-
-        <div id="status"></div>
-
-        <canvas id="canvas"></canvas>
-
-        <script type = "module" src="script.js"></script>
-
+        <script type="module" src="script.js"></script>
     </body>
 </html>

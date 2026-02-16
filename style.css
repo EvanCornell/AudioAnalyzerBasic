@@ -1,0 +1,234 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #0f0f1a;
+    color: #e0e0e8;
+    min-height: 100vh;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+}
+
+/* Header */
+header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #6e8efb, #a777e3);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.subtitle {
+    color: #888;
+    font-size: 0.95rem;
+    margin-top: 0.25rem;
+}
+
+/* Cards */
+.card {
+    background: #1a1a2e;
+    border: 1px solid #2a2a40;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+}
+
+.card h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #a0a0b8;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+}
+
+/* File Upload */
+.file-upload {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 2rem;
+    border: 2px dashed #3a3a55;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.file-upload:hover {
+    border-color: #6e8efb;
+    background: rgba(110, 142, 251, 0.05);
+}
+
+.file-upload input[type="file"] {
+    display: none;
+}
+
+.file-upload-icon {
+    font-size: 2.5rem;
+    color: #6e8efb;
+}
+
+.file-upload-text {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #c0c0d0;
+}
+
+.file-upload-hint {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.file-name {
+    text-align: center;
+    margin-top: 0.75rem;
+    font-size: 0.9rem;
+    color: #a777e3;
+    font-weight: 500;
+}
+
+/* Frequency Inputs */
+.freq-inputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.input-group label {
+    display: block;
+    font-size: 0.85rem;
+    color: #888;
+    margin-bottom: 0.4rem;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 0.6rem 0.8rem;
+    background: #12121f;
+    border: 1px solid #2a2a40;
+    border-radius: 8px;
+    color: #e0e0e8;
+    font-size: 0.95rem;
+    transition: border-color 0.2s;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: #6e8efb;
+    box-shadow: 0 0 0 3px rgba(110, 142, 251, 0.15);
+}
+
+.input-group input::placeholder {
+    color: #444;
+}
+
+/* Status */
+.status {
+    text-align: center;
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    color: #a0a0b8;
+    border-radius: 8px;
+    margin-bottom: 1.25rem;
+    display: none;
+}
+
+.status.visible {
+    display: block;
+}
+
+.status.loading {
+    color: #6e8efb;
+}
+
+.status.error {
+    color: #e85d75;
+    background: rgba(232, 93, 117, 0.08);
+    border: 1px solid rgba(232, 93, 117, 0.2);
+}
+
+/* Results */
+.results-card h2 {
+    color: #6e8efb;
+}
+
+.results-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.result-block {
+    background: #12121f;
+    border-radius: 10px;
+    padding: 1rem;
+}
+
+.result-block h3 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #a777e3;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #2a2a40;
+}
+
+.result-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 0.35rem 0;
+}
+
+.result-label {
+    font-size: 0.8rem;
+    color: #777;
+}
+
+.result-value {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #e0e0e8;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Canvas */
+canvas {
+    display: none;
+}
+
+/* Responsive */
+@media (max-width: 500px) {
+    .container {
+        padding: 1.25rem 1rem 3rem;
+    }
+
+    h1 {
+        font-size: 1.4rem;
+    }
+
+    .freq-inputs,
+    .results-grid {
+        grid-template-columns: 1fr;
+    }
+}
