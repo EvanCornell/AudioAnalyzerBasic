@@ -15,7 +15,7 @@ body {
 }
 
 .container {
-    max-width: 720px;
+    max-width: 900px;
     margin: 0 auto;
     padding: 2rem 1.5rem 4rem;
 }
@@ -133,10 +133,46 @@ h1 {
     opacity: 0.85;
 }
 
+.add-band-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
 .card-desc {
     font-size: 0.82rem;
     color: #666;
     margin: -0.5rem 0 1rem;
+}
+
+/* Progress Bar */
+.progress-bar {
+    margin-top: 1rem;
+    height: 28px;
+    background: #12121f;
+    border-radius: 14px;
+    border: 1px solid #2a2a40;
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #6e8efb, #a777e3);
+    border-radius: 14px;
+    transition: width 0.15s ease-out;
+}
+
+.progress-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #e0e0e8;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 /* Peak Band Result */
@@ -303,9 +339,74 @@ h1 {
     font-variant-numeric: tabular-nums;
 }
 
-/* Canvas */
-canvas {
-    display: none;
+/* Spectrum Analyzer */
+.spectrum-card {
+    overflow: hidden;
+}
+
+.canvas-wrap {
+    margin: 0 -1.5rem;
+    padding: 0 1.5rem;
+}
+
+.canvas-wrap canvas {
+    display: block;
+    width: 100%;
+    height: 300px;
+    border-radius: 8px;
+}
+
+.spectrum-controls {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-end;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+}
+
+.spectrum-controls .input-group {
+    flex: 1;
+    min-width: 100px;
+}
+
+.lock-label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.82rem;
+    color: #888;
+    cursor: pointer;
+    padding-bottom: 0.35rem;
+    white-space: nowrap;
+}
+
+.lock-label input[type="checkbox"] {
+    accent-color: #6e8efb;
+    width: 16px;
+    height: 16px;
+}
+
+.spectrum-readout {
+    display: flex;
+    gap: 1.5rem;
+    align-items: baseline;
+    margin-top: 0.75rem;
+    padding: 0.6rem 0.8rem;
+    background: #12121f;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: #888;
+    flex-wrap: wrap;
+}
+
+.readout-band {
+    color: #c0c0d0;
+    font-weight: 500;
+}
+
+.readout-stat strong {
+    color: #e0e0e8;
+    font-variant-numeric: tabular-nums;
 }
 
 /* Responsive */

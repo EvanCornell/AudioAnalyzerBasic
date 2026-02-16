@@ -50,6 +50,10 @@
                     </div>
                     <button id="findPeakBtn" class="add-band-btn" type="button">Find</button>
                 </div>
+                <div class="progress-bar" id="progressBar" style="display:none;">
+                    <div class="progress-fill" id="progressFill"></div>
+                    <span class="progress-text" id="progressText">0%</span>
+                </div>
                 <div class="peak-result" id="peakBandResult" style="display:none;">
                     <div class="peak-band-label" id="peakBandLabel"></div>
                     <div class="peak-band-stats">
@@ -70,6 +74,36 @@
                             <span class="result-value" id="peakBandPeakDb">—</span>
                         </div>
                     </div>
+                </div>
+            </section>
+
+            <section class="card spectrum-card" id="spectrumCard" style="display:none;">
+                <h2>Spectrum Analyzer</h2>
+                <div class="canvas-wrap">
+                    <canvas id="psdCanvas"></canvas>
+                </div>
+                <div class="spectrum-controls">
+                    <div class="input-group">
+                        <label for="bandLower">Lower (Hz)</label>
+                        <input type="number" id="bandLower" value="200" min="20" max="20000">
+                    </div>
+                    <div class="input-group">
+                        <label for="bandUpper">Upper (Hz)</label>
+                        <input type="number" id="bandUpper" value="400" min="20" max="20000">
+                    </div>
+                    <div class="input-group">
+                        <label for="bandOctaves">Octaves</label>
+                        <input type="number" id="bandOctaves" value="1.0" min="0.1" step="0.1">
+                    </div>
+                    <label class="lock-label">
+                        <input type="checkbox" id="lockOctave">
+                        <span>Lock width</span>
+                    </label>
+                </div>
+                <div class="spectrum-readout" id="spectrumReadout">
+                    <span class="readout-band" id="readoutBand">200 – 400 Hz (1.0 oct)</span>
+                    <span class="readout-stat">Band: <strong id="readoutBandDb">—</strong> dBFS</span>
+                    <span class="readout-stat">Relative: <strong id="readoutRelDb">—</strong> dB</span>
                 </div>
             </section>
 
@@ -100,7 +134,6 @@
                 </div>
             </section>
 
-            <canvas id="canvas"></canvas>
         </div>
 
         <script type="module" src="script.js"></script>
