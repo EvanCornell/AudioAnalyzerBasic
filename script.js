@@ -190,10 +190,14 @@ function analyzeAndRender() {
     grid.querySelectorAll('.band-result-block').forEach(el => el.remove());
 
     // Compute and render each band
+    const totalRmsDb = (20 * Math.log10(rmsIntensity)).toFixed(2);
+
     bands.forEach(band => {
         const [rms, peak] = computeBandRMS(currentAudioBuffer, band.f1, band.f2);
         const rmsDb = (20 * Math.log10(rms)).toFixed(2);
         const peakDb = (20 * Math.log10(peak)).toFixed(2);
+        const relDb = (rmsDb - totalRmsDb).toFixed(2);
+        const relSign = relDb >= 0 ? '+' : '';
 
         const block = document.createElement('div');
         block.className = 'result-block band-result-block';
@@ -206,6 +210,10 @@ function analyzeAndRender() {
             <div class="result-row">
                 <span class="result-label">RMS (dBFS)</span>
                 <span class="result-value">${rmsDb} dB</span>
+            </div>
+            <div class="result-row">
+                <span class="result-label">Relative</span>
+                <span class="result-value">${relSign}${relDb} dB</span>
             </div>
             <div class="result-row">
                 <span class="result-label">Peak Amplitude</span>
