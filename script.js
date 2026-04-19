@@ -1,9 +1,10 @@
-import { computePSD, queryBandPower } from './psd.js';
+import { computePSD, queryBandPower, applyFrequencyWeighting } from './psd.js';
 
 //Audio Context
 const audioContext = new AudioContext();
 let currentAudioBuffer = null;
 let currentPSD = null;
+let currentWeightedBuffer = null;
 
 // Band list
 const bands = [];
@@ -136,7 +137,7 @@ async function findPeakBand() {
         const f1 = fc / Math.pow(2, halfOct);
         const f2 = fc * Math.pow(2, halfOct);
 
-        const [rms, peak] = computeBandRMS(currentAudioBuffer, f1, f2);
+        const [rms, peak] = computeBandRMS(currentWeightedBuffer || currentAudioBuffer, f1, f2);
         if (rms > bestRms) {
             bestRms = rms;
             bestPeak = peak;
@@ -251,6 +252,13 @@ document.getElementById('fileInput').addEventListener('change',async function(e)
     } catch (error) {
         showStatus('Error: ' + error.message, 'error');
         console.log(error);
+    }
+});
+
+document.getElementById('weightingSelect').addEventListener('change', function() {
+    if (currentAudioBuffer) {
+        showStatus('Applying weighting...', 'loading');
+        analyzeAndRender();
     }
 });
 
@@ -481,7 +489,8 @@ function drawPSD() {
     ctx.save();
     ctx.translate(14, (plotT + plotB) / 2);
     ctx.rotate(-Math.PI / 2);
-    ctx.fillText('dBFS / Hz', 0, 0);
+    const wt = document.getElementById('weightingSelect').value;
+    ctx.fillText(wt === 'Z' ? 'dBFS / Hz' : `dB${wt} / Hz`, 0, 0);
     ctx.restore();
 
     // Draw band overlay
@@ -666,16 +675,37 @@ window.addEventListener('mouseup', function() {
     }
 });
 
-// --- Integrate PSD computation into file load ---
+// --- Integrate PSD computation + frequency weighting into file load ---
 const origAnalyzeAndRender = analyzeAndRender;
 
-// Wrap analyzeAndRender to also compute PSD
 analyzeAndRender = function() {
-    origAnalyzeAndRender();
+    const weightType = document.getElementById('weightingSelect').value;
 
+    // Apply frequency weighting to raw samples
+    if (weightType === 'Z') {
+        currentWeightedBuffer = currentAudioBuffer;
+    } else {
+        const samples = currentAudioBuffer.getChannelData(0);
+        const weighted = applyFrequencyWeighting(samples, currentAudioBuffer.sampleRate, weightType);
+        currentWeightedBuffer = audioContext.createBuffer(1, weighted.length, currentAudioBuffer.sampleRate);
+        currentWeightedBuffer.copyToChannel(weighted, 0);
+    }
+
+    // Run analysis on weighted buffer
+    const savedBuffer = currentAudioBuffer;
+    currentAudioBuffer = currentWeightedBuffer;
+    origAnalyzeAndRender();
+    currentAudioBuffer = savedBuffer;
+
+    // PSD on weighted buffer
     showStatus('Computing spectrum...', 'loading');
-    currentPSD = computePSD(currentAudioBuffer);
+    currentPSD = computePSD(currentWeightedBuffer);
     document.getElementById('spectrumCard').style.display = 'block';
+
+    // Update results heading with weighting label
+    const weightLabel = weightType === 'Z' ? '' : ` (${weightType}-weighted)`;
+    document.querySelector('#resultsCard h2').textContent = 'Results' + weightLabel;
+
     refreshSpectrum();
     showStatus('Analysis complete.', 'success');
 };
