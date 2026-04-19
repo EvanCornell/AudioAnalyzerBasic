@@ -44,6 +44,110 @@ function fft(real, imag) {
     }
 }
 
+// --- Frequency weighting curves (IEC 61672-1) ---
+// Each returns un-normalized linear amplitude gain for frequency f (Hz).
+
+function weightA(f) {
+    if (f <= 0) return 0;
+    const f2 = f * f;
+    return (12194 * 12194 * f2 * f2) /
+        ((f2 + 20.6 * 20.6) * Math.sqrt((f2 + 107.7 * 107.7) * (f2 + 737.9 * 737.9)) * (f2 + 12194 * 12194));
+}
+
+function weightB(f) {
+    if (f <= 0) return 0;
+    const f2 = f * f;
+    return (12194 * 12194 * f2 * f) /
+        ((f2 + 20.6 * 20.6) * Math.sqrt(f2 + 158.5 * 158.5) * (f2 + 12194 * 12194));
+}
+
+function weightC(f) {
+    if (f <= 0) return 0;
+    const f2 = f * f;
+    return (12194 * 12194 * f2) /
+        ((f2 + 20.6 * 20.6) * (f2 + 12194 * 12194));
+}
+
+// Normalization constants (gain at 1000 Hz → unity)
+const _normA = weightA(1000);
+const _normB = weightB(1000);
+const _normC = weightC(1000);
+
+function getWeightingGain(f, type) {
+    switch (type) {
+        case 'A': return weightA(f) / _normA;
+        case 'B': return weightB(f) / _normB;
+        case 'C': return weightC(f) / _normC;
+        default:  return 1.0;
+    }
+}
+
+// Inverse FFT via conjugate trick: conjugate → fft → conjugate → scale by 1/N
+function ifft(real, imag) {
+    const N = real.length;
+    for (let i = 0; i < N; i++) imag[i] = -imag[i];
+    fft(real, imag);
+    for (let i = 0; i < N; i++) {
+        real[i] /= N;
+        imag[i] = -imag[i] / N;
+    }
+}
+
+/**
+ * Apply frequency weighting to PCM samples using overlap-add FFT filtering.
+ * @param {Float32Array} samples - input PCM samples (mono)
+ * @param {number} sampleRate
+ * @param {string} weightType - 'A', 'B', 'C', or 'Z'
+ * @returns {Float32Array} weighted samples (same length)
+ */
+export function applyFrequencyWeighting(samples, sampleRate, weightType) {
+    if (weightType === 'Z') return samples;
+
+    const totalN = samples.length;
+    const segmentLen = 8192;
+    const fftSize = segmentLen * 2; // zero-pad to avoid circular convolution
+    const output = new Float32Array(totalN);
+
+    // Pre-compute weighting gains per bin
+    const gains = new Float64Array(fftSize);
+    const binWidth = sampleRate / fftSize;
+    for (let k = 0; k <= fftSize / 2; k++) {
+        gains[k] = getWeightingGain(k * binWidth, weightType);
+    }
+    // Mirror for negative frequencies
+    for (let k = fftSize / 2 + 1; k < fftSize; k++) {
+        gains[k] = gains[fftSize - k];
+    }
+
+    const real = new Float64Array(fftSize);
+    const imag = new Float64Array(fftSize);
+
+    for (let start = 0; start < totalN; start += segmentLen) {
+        const end = Math.min(start + segmentLen, totalN);
+        const count = end - start;
+
+        for (let i = 0; i < count; i++) real[i] = samples[start + i];
+        for (let i = count; i < fftSize; i++) real[i] = 0;
+        for (let i = 0; i < fftSize; i++) imag[i] = 0;
+
+        fft(real, imag);
+
+        for (let k = 0; k < fftSize; k++) {
+            real[k] *= gains[k];
+            imag[k] *= gains[k];
+        }
+
+        ifft(real, imag);
+
+        const addEnd = Math.min(start + fftSize, totalN);
+        for (let i = 0; i < addEnd - start; i++) {
+            output[start + i] += real[i];
+        }
+    }
+
+    return output;
+}
+
 // Hann window coefficients (cached per size)
 const hannCache = {};
 function hannWindow(N) {
